@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tattoo Motif Randomizer</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Miltonian+Tattoo&display=swap" rel="stylesheet">
+
+  <style>
+    .miltonian-tattoo-regular {
+      font-family: "Miltonian Tattoo", serif;
+      font-weight: 400;
+      font-style: normal;
+    }
+
+    :root {
+      --ink: #2b1a10;
+      --button: #b83a31;
+      --button-dark: #8f231f;
+      --panel: rgba(255, 248, 232, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      min-height: 100%;
+    }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      color: var(--ink);
+      background-color: #ded3bd;
+      background-image: url("https://www.transparenttextures.com/patterns/natural-paper.png");
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .wrap {
+      width: min(760px, 100%);
+      display: grid;
+      gap: 18px;
+      justify-items: center;
+      text-align: center;
+    }
+
+    .title {
+      margin: 0;
+      font-size: clamp(2rem, 6vw, 4.8rem);
+      line-height: 0.95;
+      color: var(--ink);
+      text-transform: uppercase;
+    }
+
+    .subtitle {
+      margin: 0;
+      max-width: 54ch;
+      font-size: clamp(1rem, 2.4vw, 1.1rem);
+      line-height: 1.5;
+      color: rgba(43, 26, 16, 0.82);
+    }
+
+    .controls {
+      width: 100%;
+      display: grid;
+      gap: 14px;
+      justify-items: center;
+      margin-top: 4px;
+    }
+
+    select {
+      width: min(100%, 260px);
+      padding: 12px 16px;
+      border: none;
+      border-radius: 999px;
+      background: var(--panel);
+      color: var(--ink);
+      font: inherit;
+      box-shadow: 0 8px 18px rgba(43, 26, 16, 0.10);
+      outline: none;
+      cursor: pointer;
+    }
+
+    .result-area {
+      width: min(100%, 680px);
+      min-height: 220px;
+      display: grid;
+      place-items: center;
+      padding: 18px 12px;
+    }
+
+    .results {
+      width: 100%;
+      display: grid;
+      gap: 10px;
+      justify-items: center;
+    }
+
+    .result {
+      width: 100%;
+      min-height: 1.3em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+
+      font-family: "Miltonian Tattoo", serif;
+      font-weight: 400;
+      font-style: normal;
+      text-transform: uppercase;
+
+      font-size: clamp(1.35rem, 2.9vw, 2.25rem);
+      line-height: 1.15;
+      letter-spacing: 0.02em;
+      color: var(--ink);
+
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+
+      transition: transform 0.12s ease, opacity 0.12s ease, filter 0.12s ease;
+    }
+
+    .result.spinning {
+      transform: scale(0.985);
+      opacity: 0.9;
+      filter: blur(0.2px);
+    }
+
+    .button-row {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      margin-top: 6px;
+    }
+
+    button {
+      appearance: none;
+      border: none;
+      border-radius: 999px;
+      padding: 16px 30px;
+      min-width: min(100%, 220px);
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #fff7eb;
+      cursor: pointer;
+      background: linear-gradient(180deg, var(--button) 0%, var(--button-dark) 100%);
+      box-shadow: 0 10px 20px rgba(43, 26, 16, 0.18);
+      transition: transform 0.16s ease, opacity 0.16s ease;
+    }
+
+    button:hover:not(:disabled) {
+      transform: translateY(-1px);
+      opacity: 0.98;
+    }
+
+    button:active:not(:disabled) {
+      transform: translateY(1px);
+    }
+
+    button:disabled {
+      opacity: 0.72;
+      cursor: wait;
+    }
+
+    @media (max-width: 640px) {
+      body {
+        padding: 16px;
+      }
+
+      .wrap {
+        gap: 16px;
+      }
+
+      .result-area {
+        min-height: 180px;
+        padding: 12px 8px;
+      }
+
+      select,
+      button {
+        width: 100%;
+      }
+
+      .result {
+        font-size: clamp(1.2rem, 5vw, 1.8rem);
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <h1 class="title miltonian-tattoo-regular">TATTOO MOTIF RANDOMIZER</h1>
+    <p class="subtitle">
+      Press the button to select 1, 2, or 3 random tattoo motifs.
+    </p>
+
+    <div class="controls">
+      <select id="countSelect" aria-label="Number of selections">
+        <option value="1">1 selection</option>
+        <option value="2">2 selections</option>
+        <option value="3">3 selections</option>
+      </select>
+    </div>
+
+    <section class="result-area" aria-live="polite" aria-atomic="true">
+      <div class="results">
+        <div class="result" id="result1">Press Spin</div>
+        <div class="result" id="result2"></div>
+        <div class="result" id="result3"></div>
+      </div>
+    </section>
+
+    <div class="button-row">
+      <button id="spinBtn" type="button">Spin</button>
+    </div>
+  </main>
+
+  <script>
+    const items = [
+      "Wolf",
+      "Gorilla",
+      "Butterfly",
+      "Snake",
+      "Lightening",
+      "Clipper Ship",
+      "Spider Web",
+      "Skull",
+      "Grim Reaper",
+      "Rose",
+      "Flower (Not Rose)",
+      "Sacred Heart",
+      "Dice",
+      "Banner",
+      "Pinup",
+      "Crazy Sal",
+      "Swallow",
+      "Dagger",
+      "Octopus",
+      "Vase & Flowers",
+      "Plague Doctor",
+      "Anchor",
+      "Cactus",
+      "Eagle",
+      "Moth",
+      "Horse Shoe",
+      "4 Leaf Clover",
+      "Tiger",
+      "Shark",
+      "Straight Razor",
+      "Flail",
+      "Arrows (Broken)",
+      "Lantern",
+      "Heart",
+      "Cherries",
+      "Flames",
+      "Panther",
+      "Jesus",
+      "Moon",
+      "Chain",
+      "Coffin Nails",
+      "Centipede",
+      "Bat",
+      "Pocket Watch",
+      "Hourglass",
+      "Playing Cards",
+      "Mushroom(S)",
+      "Stairway To Nowhere",
+      "Cupid",
+      "Nautical Star",
+      "Candle",
+      "Spider",
+      "Dragon",
+      "Barbed Wire",
+      "Tooth/Teeth",
+      "Scorpion",
+      "Horse",
+      "Lighthouse",
+      "Mermaid",
+      "Hands",
+      "Diamond",
+      "Coffin",
+      "Knuckle Duster",
+      "Boxing Gloves",
+      "Axe",
+      "Sun",
+      "Waves",
+      "Bird",
+      "Devil",
+      "Girl Head",
+      "Rat",
+      "Raven",
+      "Rooster",
+      "Peacock",
+      "Owl",
+      "Cross",
+      "Chrysanthemum",
+      "Lily",
+      "Cherry Blossom",
+      "Peony",
+      "Rope Knot",
+      "Eye",
+      "Handshake",
+      "Demon Mask",
+      "Lucky Rabbit'S Foot",
+      "Padlock",
+      "Bear"
+    ];
+
+    const countSelect = document.getElementById("countSelect");
+    const spinBtn = document.getElementById("spinBtn");
+    const resultEls = [
+      document.getElementById("result1"),
+      document.getElementById("result2"),
+      document.getElementById("result3")
+    ];
+
+    function pickUniqueRandom(count) {
+      const pool = [...items];
+      const picks = [];
+
+      while (picks.length < count && pool.length > 0) {
+        const index = Math.floor(Math.random() * pool.length);
+        picks.push(pool.splice(index, 1)[0]);
+      }
+
+      return picks;
+    }
+
+    function spinSlot(slotEl, finalText) {
+      return new Promise((resolve) => {
+        const totalTicks = 8 + Math.floor(Math.random() * 5);
+        let tick = 0;
+        let delay = 40;
+
+        const cycle = () => {
+          if (tick < totalTicks) {
+            slotEl.textContent = items[Math.floor(Math.random() * items.length)].toUpperCase();
+            tick++;
+            delay += 12;
+            setTimeout(cycle, delay);
+          } else {
+            slotEl.textContent = finalText.toUpperCase();
+            slotEl.classList.remove("spinning");
+            resolve();
+          }
+        };
+
+        slotEl.classList.add("spinning");
+        cycle();
+      });
+    }
+
+    async function spin() {
+      spinBtn.disabled = true;
+
+      const count = Number(countSelect.value);
+      const picks = pickUniqueRandom(count);
+
+      for (let i = 0; i < resultEls.length; i++) {
+        if (i < count) {
+          resultEls[i].style.display = "flex";
+        } else {
+          resultEls[i].textContent = "";
+          resultEls[i].style.display = "none";
+        }
+      }
+
+      await Promise.all(
+        picks.map((pick, index) => spinSlot(resultEls[index], pick))
+      );
+
+      spinBtn.disabled = false;
+    }
+
+    spinBtn.addEventListener("click", spin);
+
+    window.addEventListener("keydown", (e) => {
+      if ((e.key === " " || e.key === "Enter") && !spinBtn.disabled) {
+        e.preventDefault();
+        spin();
+      }
+    });
+  </script>
+</body>
+</html>
