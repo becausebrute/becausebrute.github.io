@@ -1,0 +1,34 @@
+name: Unzip site files
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  unzip:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract site zip
+        run: |
+          unzip -o becausebrute-site.zip
+          rm -f becausebrute-site.zip
+          rm -rf __MACOSX
+          if [ ! -f index.html ]; then
+            for d in */; do
+              if [ -f "$d/index.html" ]; then
+                cp -a "$d". .
+                rm -rf "$d"
+                break
+              fi
+            done
+          fi
+          ls -la
+      - name: Commit extracted files
+        run: |
+          rm -rf .github
+          git config user.name "becausebrute"
+          git config user.email "jbrute515@gmail.com"
+          git add -A
+          git status --short
+          git commit -m "Add portfolio site files" || echo "Nothing to commit"
+          git push
